@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import io from 'socket.io-client';
-import ControlsContext from './controlsProvider';
+import SettingsContext from './settings-context';
+import Settings from './settings';
 import "./App.css";
 
 const socket = io('http://localhost:6767');
@@ -9,17 +10,7 @@ class App extends Component {
     constructor() {
         super();
         this.state = {
-            sensitivity: {
-                default: {
-                    a: 50,
-                    b: 50,
-                    c: 50,
-                    d: 50,
-                    sprint: 2,
-                    walk: 0.5
-                }
-            },
-            controlLayout: "default",
+            showSettings: false,
             sensitivityLayout: "default",
             mouse: {
                 x: 0,
@@ -37,22 +28,28 @@ class App extends Component {
         
         let isRepeat = e.repeat;
         let command = this.getCommandFromKeycode(e.keyCode);
-
-        if (!isRepeat && command) {
-            this.setState(prevState => {
-                return {commands: [...prevState.commands, command]}
-            }, () => {
-                console.log(this.state.commands);
-                this.createCommand();
-            })
+        
+        if (!isRepeat) {
+            if (command === "TOGGLE_SETTINGS") {
+                this.toggleSettings();
+            } else {
+                this.setState(prevState => {
+                    return {commands: [...prevState.commands, command]}
+                }, () => {
+                    console.log(this.state.commands);
+                    this.createCommand();
+                });
+            }
         }
-        
-        
     }
 
     handleKeyUp = (e) => {
         e.preventDefault();
         let command = this.getCommandFromKeycode(e.keyCode);
+
+        if (command !== "TOGGLE_SETTINGS") {
+            return;
+        }
         
         let cmdIndex = this.state.commands.indexOf(command);
         
@@ -68,84 +65,37 @@ class App extends Component {
         }
     }
 
-    getCommandFromKeycode(keycode) {
-        const controlLayout = this.state.controlLayout;
+    toggleSettings = () => {
+        this.setState(prevState => ({
+            showSettings: !prevState.showSettings
+        }));
+    }
 
-        let command = null;
-        switch(keycode) {
-            case this.state.controls[controlLayout].strafeLeft: {
-                command = 'left';
-                break;
+    getCommandFromKeycode(keycode) {
+
+        const { controls } = this.context;
+
+        const command = controls.filter((control) => {
+            if(control.keycode === keycode) {
+                return control;
             }
-            case this.state.controls[controlLayout].forward: {
-                command = 'forward';
-                break;
-            }
-            case this.state.controls[controlLayout].strafeRight: {
-                command = 'right';
-                break;
-            }
-            case this.state.controls[controlLayout].backward: {
-                command = 'backward'
-                break;
-            }
-            case this.state.controls[controlLayout].up: {
-                command = 'up'
-                break;
-            }
-            case this.state.controls[controlLayout].down: {
-                command = 'down';
-                break;
-            }
-            case this.state.controls[controlLayout].turnRight: {
-                command = 'cw'
-                break;
-            }
-            case this.state.controls[controlLayout].turnLeft: {
-                command = 'ccw'
-                break;
-            }
-            case this.state.controls[controlLayout].land:
-            case this.state.controls[controlLayout].takeOff: {
-                //need some logic to handle if switch bettwen the two commands
-                console.log('landing/taking off');
-                command = "land/takeoff";
-                break;
-            }
-            case this.state.controls[controlLayout].recordOn:
-            case this.state.controls[controlLayout].recordOff: {
-                //need some logic to handle if switch bettwen the two commands
-                command = "streamon/off";
-                break;
-            }
-            case this.state.controls[controlLayout].emergency: {
-                command = "emergency";
-                break;
-            }
-            case this.state.controls[controlLayout].sprint: {
-                command = "shift";
-                break;
-            }
-            case this.state.controls[controlLayout].walk: {
-                command = "ctrl";
-                break;
-            }
-        }
-        return command;
+        });
+
+        return command[0].command;
+
     }
 
     addSpeedModifier(speed) {
-        const commands = this.state.commands;
-        const sensitivityLayout = this.state.sensitivityLayout;
-        const sensitivity = this.state.sensitivity;
+        const {commands} = this.state;
+        const {sensitivity} = this.context;
 
         if (commands.indexOf("shift") !== -1) {
-            speed = speed * sensitivity[sensitivityLayout].sprint;
+            speed = speed * sensitivity.sprint;
             if (speed > 100) {
                 speed = 100;
             }
         } else if (commands.indexOf("ctrl") !== -1) {
-            speed = speed * sensitivity[sensitivityLayout].walk;
+            speed = speed * sensitivity.walk;
         }
 
         return speed;
@@ -196,7 +146,7 @@ class App extends Component {
             let c = 0;
             let d = 0;
             const sensitivityLayout = this.state.sensitivityLayout;
-            const sensitivity = this.state.sensitivity[sensitivityLayout];
+            const sensitivity = this.context.sensitivity[sensitivityLayout];
             if (commands.indexOf("right") !== -1) {
                 a = a + sensitivity.a;
                 a = this.addSpeedModifier(a);
@@ -273,11 +223,9 @@ class App extends Component {
         socket.emit('command', command);
     }
     render() {
-
         const {showSettings} = this.state;
-
         return (
-            <div className="App">
+            <div className="App" tabIndex={-1} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp}>
                 {showSettings ?  <Settings /> : null}
                 <header className="App-header">
                     Drone front end
@@ -289,7 +237,7 @@ class App extends Component {
                     {this.state.droneData ? this.state.droneData.bat : ''}
                 </div>
                 
-                <div className="enterManualMode" tabIndex={-1} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp} /*onMouseMove={this.handleMouseMove}*/>
+                <div className="enterManualMode"  /*onMouseMove={this.handleMouseMove}*/>
                     Click me to enter flight mode
                 </div>
                 <div className="droneControls">
@@ -326,6 +274,6 @@ class App extends Component {
     }
 }
 
-App.contextType = ControlsContext;
+App.contextType = SettingsContext;
 
 export default App;
