@@ -225,25 +225,28 @@ class App extends Component {
     render() {
         const {showSettings} = this.state;
         return (
-            <div className="App" tabIndex={-1} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp}>
+            <React.Fragment>
                 {showSettings ?  <Settings /> : null}
-                <header className="App-header">
-                    Drone front end
-                </header>
-                <div className="connected">
-                    {this.state.connected ? 'Connected' :  'Disconnected'}
+                <div className="App" tabIndex={-1} onKeyDown={this.handleKeyDown} onKeyUp={this.handleKeyUp}>
+                    <header className="App-header">
+                        Drone front end
+                    </header>
+                    <div className="connected">
+                        {this.state.connected ? 'Connected' :  'Disconnected'}
+                    </div>
+                    <div className="droneState">
+                        {this.state.droneData ? this.state.droneData.bat : ''}
+                    </div>
+                    
+                    <div className="enterManualMode"  /*onMouseMove={this.handleMouseMove}*/>
+                        Click me to enter flight mode
+                    </div>
+                    <div className="droneControls">
+                        <button onClick={() => this.sendCommand("battery?")}>Check battery</button>
+                    </div>
                 </div>
-                <div className="droneState">
-                    {this.state.droneData ? this.state.droneData.bat : ''}
-                </div>
-                
-                <div className="enterManualMode"  /*onMouseMove={this.handleMouseMove}*/>
-                    Click me to enter flight mode
-                </div>
-                <div className="droneControls">
-                    <button onClick={() => this.sendCommand("battery?")}>Check battery</button>
-                </div>
-            </div>
+            </React.Fragment>
+            
         );
     }
 
