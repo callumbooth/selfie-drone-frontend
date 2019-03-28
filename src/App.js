@@ -25,18 +25,20 @@ class App extends Component {
     }
     handleKeyDown = (e) => {
         e.preventDefault();
-        
-        let isRepeat = e.repeat;
+
         let command = this.getCommandFromKeycode(e.keyCode);
+
+        if (!command) {
+            return;
+        }
         
-        if (!isRepeat) {
+        if (!e.repeat) {
             if (command === "TOGGLE_SETTINGS") {
                 this.toggleSettings();
             } else {
                 this.setState(prevState => {
                     return {commands: [...prevState.commands, command]}
                 }, () => {
-                    console.log(this.state.commands);
                     this.createCommand();
                 });
             }
@@ -45,15 +47,15 @@ class App extends Component {
 
     handleKeyUp = (e) => {
         e.preventDefault();
-        let command = this.getCommandFromKeycode(e.keyCode);
 
-        if (command !== "TOGGLE_SETTINGS") {
+        let command = this.getCommandFromKeycode(e.keyCode);
+        
+        if (!command || command === "TOGGLE_SETTINGS") {
             return;
         }
         
         let cmdIndex = this.state.commands.indexOf(command);
-        
-
+                
         if (command) {
             this.setState(prevState => {
                 return {
@@ -75,14 +77,17 @@ class App extends Component {
 
         const { controls } = this.context;
 
-        const command = controls.filter((control) => {
+        const setting = controls.filter((control) => {
             if(control.keycode === keycode) {
                 return control;
             }
         });
 
-        return command[0].command;
+        if (setting.length === 0 || !setting[0].command) {
+            return false;
+        }
 
+        return setting[0].command;
     }
 
     addSpeedModifier(speed) {
@@ -223,6 +228,7 @@ class App extends Component {
         socket.emit('command', command);
     }
     render() {
+        console.log(this.state.commands);
         const {showSettings} = this.state;
         return (
             <React.Fragment>

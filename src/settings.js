@@ -1,4 +1,4 @@
-import React, {Fragment, useState, useContext} from 'react';
+import React, {Fragment, useState, useContext, useRef} from 'react';
 import SettingsContext from './settings-context';
 
 
@@ -12,52 +12,58 @@ const Settings = () => {
         initialState[controls[i].name] = controls[i]
     }
 
-    const [state, setState] = useState(initialState);
+    const [state, setState] = useState({
+        update: 0,
+        controls
+    });
+
+    const settingsContainer = useRef(null);
+
+    
 
     const updateField = (e) => {
+        e.persist();
         //need to get the key data from the target value, so we can update things like the keycode and letter
-        
-        const newSetting = {
-            name: e.target.name,
-            key: e.target.value
-        }
-
-        setState({
-            ...state,
-            [e.target.name]: newSetting
-        })
+        setState(prevState => {
+            for(let i = 0; i < prevState.controls.length; i++) {
+                if (e.target !== null && prevState.controls[i].name === e.target.dataset.name) {
+                    prevState.controls[i].key = e.key;
+                    prevState.controls[i].keycode = e.keyCode 
+                }
+            }
+            return {update: prevState.update + 1, controls: prevState.controls};
+        });
+        settingsContainer.current.focus();
     }
 
     const focusField = (e) => {
-        const newSetting = {
-            name: e.target.name,
-            key: ""
-        }
-        setState({
-            ...state,
-            [e.target.name]: newSetting
-        })
+        e.persist();
+        //need to get the key data from the target value, so we can update things like the keycode and letter
+        setState(prevState => {
+            for(let i = 0; i < prevState.controls.length; i++) {
+                if (e.target !== null && prevState.controls[i].name === e.target.dataset.name) {
+                    prevState.controls[i].key = "";
+                    prevState.controls[i].keycode = 0 
+                }
+            }
+            return {update: prevState.update + 1, controls: prevState.controls};
+        });
     }
+
     return (
-        <Fragment>
-            {console.log(state)}
-            <form onSubmit={(e) => {
-                e.preventDefault();
-                console.log(state);
-            }}>
-                {controls.map((control, i) => {
-                    return (
-                        <div key={control.name} style={{'display':"block"}}>
-                            <label htmlFor={control.name}>
-                                {control.label}
-                            </label>
-                            <input type="text" name={control.name} value={state[control.name].key} maxLength={1} onChange={updateField} onFocus={focusField} />
+        <div id="settingspage" ref={settingsContainer}>
+            {state.update}
+            {state.controls.map((control, i) => {
+                return (
+                    <div key={control.name} style={{'display':"block"}}>
+                        <div>
+                            {control.label}
                         </div>
-                    )
-                })}
-                <input type="submit" />
-            </form>
-        </Fragment>
+                        <div data-name={control.name} tabIndex={-1} onClick={focusField} onKeyDown={updateField}>{control.key ? control.key : "empty"}</div>
+                    </div>
+                )
+            })}
+        </div>
     )
 }
 
