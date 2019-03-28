@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import io from 'socket.io-client';
 import SettingsContext from './settings-context';
 import Settings from './settings';
+import ThreeModel from './3dModel';
 import "./App.css";
 
 const socket = io('http://localhost:6767');
@@ -18,7 +19,11 @@ class App extends Component {
             },
             streamon: false,
             connected: false,
-            droneData: null,
+            droneData: {
+                x: 0,
+                y: 0,
+                z: 0
+            },
             commands: [],
             inAir: false
         }
@@ -80,6 +85,8 @@ class App extends Component {
         const setting = controls.filter((control) => {
             if(control.keycode === keycode) {
                 return control;
+            } else {
+                return false;
             }
         });
 
@@ -227,6 +234,7 @@ class App extends Component {
         console.log('sending command: ' + command);
         socket.emit('command', command);
     }
+
     render() {
         console.log(this.state.commands);
         const {showSettings} = this.state;
@@ -251,8 +259,8 @@ class App extends Component {
                         <button onClick={() => this.sendCommand("battery?")}>Check battery</button>
                     </div>
                 </div>
+                <ThreeModel data={this.state.droneData}/>
             </React.Fragment>
-            
         );
     }
 
