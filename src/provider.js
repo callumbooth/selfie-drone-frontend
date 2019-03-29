@@ -116,14 +116,12 @@ const settings = {
         } 
     ],
     sensitivity: {
-        default: {
-            a: 50,
-            b: 50,
-            c: 50,
-            d: 50,
-            sprint: 2,
-            walk: 0.5
-        }
+        a: 50,
+        b: 50,
+        c: 50,
+        d: 50,
+        sprint: 2,
+        walk: 0.5
     },
 }
 
