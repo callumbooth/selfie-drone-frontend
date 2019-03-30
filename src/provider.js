@@ -133,6 +133,11 @@ const settings = {
 
     setConnected: (val) => {
         settings.connected = val;
+    },
+
+    updateControls: (controls) => {
+        console.log("here");
+        settings.controls = controls;
     }
 }
 

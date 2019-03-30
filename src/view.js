@@ -2,10 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import io from 'socket.io-client';
 import SettingsContext from './settings-context';
 import Settings from './settings';
+import PathBuilder from './pathBuilder';
 
 const socket = io('http://localhost:6767');
 
-const View = () => {
+const View = (props) => {
 
     const context = useContext(SettingsContext);
     const [state, setState] = useState({
@@ -15,13 +16,11 @@ const View = () => {
             y: 0
         },
         streamon: false,
-        connected: false,
         commands: [],
-        inAir: false
+        inAir: false,
+        flightMode: true
     });
 
-    const [droneState, setDroneState] = useState(null)
-    console.log(state);
     useEffect(() => {
         if (state.commands) {
             createCommand();
@@ -225,47 +224,33 @@ const View = () => {
     //     })
     // }
 
-    useEffect(() => {
-        socket.on("status", (status) => {
-            console.log(status);
-            setState({
-                connected: true
-            });
-        });
-        
-        socket.on('dronestate', (state) => {
-            setDroneState(null);
-        });
-
-        socket.on('dronestream', (stream) => {
-            console.log(stream);
-        });
-    }, []);
-
-    
-    console.log(state.commands);
-    const {showSettings} = state;
+    const {showSettings, flightMode} = state;
+    const {battery} = props;
     return (
         <React.Fragment>
             {showSettings ?  <Settings /> : null}
-            <div className="App" tabIndex={-1} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
-                <header className="App-header">
-                    Drone front end
-                </header>
-                <div className="connected">
-                    {state.connected ? 'Connected' :  'Disconnected'}
+            {flightMode ?
+                <div className="App" tabIndex={-1} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp}>
+                    <header className="App-header">
+                        Drone front end
+                    </header>
+                    <div className="connected">
+                        {context.connected ? 'Connected' :  'Disconnected'}
+                    </div>
+                    <div className="droneState">
+                        {battery ? battery : ''}
+                    </div>
+                    
+                    <div className="enterManualMode"  /*onMouseMove={this.handleMouseMove}*/>
+                        Click me to enter flight mode
+                    </div>
+                    <div className="droneControls">
+                        <button onClick={() => context.sendCommand("battery?")}>Check battery</button>
+                    </div>
                 </div>
-                <div className="droneState">
-                    {droneState ? droneState.bat : ''}
-                </div>
-                
-                <div className="enterManualMode"  /*onMouseMove={this.handleMouseMove}*/>
-                    Click me to enter flight mode
-                </div>
-                <div className="droneControls">
-                    <button onClick={() => context.sendCommand("battery?")}>Check battery</button>
-                </div>
-            </div>
+                : 
+                <PathBuilder />
+            }
         </React.Fragment>
     );
 

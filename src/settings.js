@@ -17,8 +17,6 @@ const Settings = () => {
         controls
     });
 
-    const settingsContainer = useRef(null);
-
     
 
     const updateField = (e) => {
@@ -33,12 +31,11 @@ const Settings = () => {
             }
             return {update: prevState.update + 1, controls: prevState.controls};
         });
-        settingsContainer.current.focus();
     }
 
     const focusField = (e) => {
         e.persist();
-        //need to get the key data from the target value, so we can update things like the keycode and letter
+        
         setState(prevState => {
             for(let i = 0; i < prevState.controls.length; i++) {
                 if (e.target !== null && prevState.controls[i].name === e.target.dataset.name) {
@@ -48,10 +45,11 @@ const Settings = () => {
             }
             return {update: prevState.update + 1, controls: prevState.controls};
         });
+
     }
 
     return (
-        <div id="settingspage" ref={settingsContainer}>
+        <div id="settingspage">
             {state.update}
             {state.controls.map((control, i) => {
                 return (

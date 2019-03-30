@@ -1,41 +1,39 @@
 import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 
-const ThreeModel = (props) => {
+const ThreeCanvas = (props) => {
     const mount = useRef(null);
-
     useEffect(() => {
-        let droneData = {
-            x: 0,
-            y: 0,
-            z: 0
-        };
-
-        if (props.droneData === null) {
-            droneData = props.droneData;
-        }
-
         let width = mount.current.clientWidth;
         let height = mount.current.clientHeight;
         let frameId;
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-            75,
-            width / height,
-            0.1,
-            1000
-        );
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
-        const cube = new THREE.Mesh(geometry, material);
-
-        camera.position.z = 3;
-
-        scene.add(cube);
-        renderer.setClearColor("#000000");
+        //RENDERER
+        const renderer = new THREE.WebGLRenderer({antialias: true});
+        renderer.setClearColor(0xffffff);
         renderer.setSize(width, height);
+
+        //CAMERA
+        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 3000);
+        // var camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 0.1, 3000);
+
+        //SCENE
+        const scene = new THREE.Scene();
+
+        //LIGHTS
+        const light = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(light);
+        
+        const light1 = new THREE.PointLight(0xffffff, 0.5);
+        scene.add(light1);
+
+        //OBJECT
+        let geometry = new THREE.CubeGeometry(200, 50, 150);
+        let material = new THREE.MeshLambertMaterial({color: 0xeeeeeee});
+        const droneModel = new THREE.Mesh(geometry, material);
+        droneModel.position.set(0, 0, -500);
+
+        scene.add(droneModel);
 
         const renderScene = () => {
             renderer.render(scene, camera);
@@ -50,9 +48,14 @@ const ThreeModel = (props) => {
             renderScene();
         };
 
+        const angleToRadians = (angle) => {
+            return angle * (Math.PI / 180); 
+        }
+
         const animate = () => {
-            cube.rotation.x = droneData.x;
-            cube.rotation.y = droneData.y;
+            droneModel.rotation.x = angleToRadians(props.data.pitch)
+            droneModel.rotation.y = angleToRadians(props.data.yaw) * -1;
+            droneModel.rotation.z = angleToRadians(props.data.roll);
 
             renderScene();
             frameId = window.requestAnimationFrame(animate);
@@ -78,19 +81,18 @@ const ThreeModel = (props) => {
             window.removeEventListener("resize", handleResize);
             mount.current.removeChild(renderer.domElement);
 
-            scene.remove(cube);
+            scene.remove(droneModel);
             geometry.dispose();
             material.dispose();
         };
-    }, [props]);
-
+    }, [props.data]);
     return (
         <div
-            className="3dModel"
+            className="threeCanvas"
             style={{ width: "400px", height: "300px" }}
             ref={mount}
         />
     );
 };
 
-export default ThreeModel;
+export default ThreeCanvas;
