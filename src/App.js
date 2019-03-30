@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import io from 'socket.io-client';
 import SettingsContext from './settings-context';
-import Settings from './settings';
 import ThreeModel from './3dModel';
 import View from './view';
+import socket from './socket';
 import "./App.css";
-
-const socket = io('http://localhost:6767');
 
 const App = () => {
 
@@ -17,9 +14,7 @@ const App = () => {
     useEffect(() => {
         socket.on("status", (status) => {
             console.log(status);
-            setState({
-                connected: true
-            });
+            context.setConnected(true);
         });
         
         socket.on('dronestate', (state) => {
@@ -33,7 +28,7 @@ const App = () => {
 
     return (
         <React.Fragment>
-            <View />
+            <View  />
             <ThreeModel data={droneState}/>
         </React.Fragment>
     );

@@ -1,5 +1,6 @@
 import React from 'react';
 import SettingsContext from './settings-context';
+import socket from './socket';
 
 const settings = {
     controls: [
@@ -123,6 +124,16 @@ const settings = {
         sprint: 2,
         walk: 0.5
     },
+    connected: false,
+
+    sendCommand: (command) => {
+        console.log('sending command: ' + command);
+        socket.emit('command', command);
+    },
+
+    setConnected: (val) => {
+        settings.connected = val;
+    }
 }
 
 const Provider = (props) => {

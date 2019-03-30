@@ -21,9 +21,12 @@ const View = () => {
     });
 
     const [droneState, setDroneState] = useState(null)
-
+    console.log(state);
     useEffect(() => {
-        createCommand();
+        if (state.commands) {
+            createCommand();
+        }
+        
     }, [state.commands])
 
     const handleKeyDown = (e) => {
@@ -32,7 +35,7 @@ const View = () => {
         let command = getCommandFromKeycode(e.keyCode);
 
         if (!command) {
-            return;
+            return false;
         }
         
         if (!e.repeat) {
@@ -56,7 +59,7 @@ const View = () => {
         }
         
         let cmdIndex = state.commands.indexOf(command);
-                
+
         if (command) {
             setState(prevState => {
                 return {
@@ -68,6 +71,7 @@ const View = () => {
 
     const toggleSettings = () => {
         setState(prevState => ({
+            ...prevState,
             showSettings: !prevState.showSettings
         }));
     }
@@ -111,12 +115,12 @@ const View = () => {
         const {commands} = state;
 
         if (commands.indexOf("emergency") !== -1) {
-            sendCommand("emergancy");
+            context.sendCommand("emergancy");
         } else if (commands.indexOf("land/takeoff") !== -1) {
             if (state.inAir) {
-                sendCommand("land");
+                context.sendCommand("land");
             } else {
-                sendCommand("takeoff");
+                context.sendCommand("takeoff");
             }
             
             socket.once('status', (status) => {
@@ -130,9 +134,9 @@ const View = () => {
             
         } else if(commands.indexOf("streamon/off") !== -1) {
             if (state.streamon) {
-                sendCommand("streamoff");
+                context.sendCommand("streamoff");
             } else {
-                sendCommand("streamon");
+                context.sendCommand("streamon");
             }
             
             socket.once('status', (status) => {
@@ -193,38 +197,33 @@ const View = () => {
 
             if (isRc) {
                 let rcCommand = `rc ${a} ${b} ${c} ${d}`;
-                sendCommand(rcCommand);
+                context.sendCommand(rcCommand);
             }
         } else {
-            sendCommand("rc 0 0 0 0");
+            context.sendCommand("rc 0 0 0 0");
         }
     }
 
-    const handleMouseMove = (e) => {
-        if (state.mouse.x > e.screenX) {
-            console.log("left");
-        } else {
-            console.log("right");
-        }
+    // const handleMouseMove = (e) => {
+    //     if (state.mouse.x > e.screenX) {
+    //         console.log("left");
+    //     } else {
+    //         console.log("right");
+    //     }
 
-        if (state.mouse.y > e.screenY) {
-            console.log('up');
-        } else {
-            console.log('down');
-        }
+    //     if (state.mouse.y > e.screenY) {
+    //         console.log('up');
+    //     } else {
+    //         console.log('down');
+    //     }
 
-        setState({
-            mouse: {
-                x: e.screenX,
-                y: e.screenY
-            }
-        })
-    }
-
-    const sendCommand = (command) => {
-        console.log('sending command: ' + command);
-        socket.emit('command', command);
-    }
+    //     setState({
+    //         mouse: {
+    //             x: e.screenX,
+    //             y: e.screenY
+    //         }
+    //     })
+    // }
 
     useEffect(() => {
         socket.on("status", (status) => {
@@ -264,7 +263,7 @@ const View = () => {
                     Click me to enter flight mode
                 </div>
                 <div className="droneControls">
-                    <button onClick={() => sendCommand("battery?")}>Check battery</button>
+                    <button onClick={() => context.sendCommand("battery?")}>Check battery</button>
                 </div>
             </div>
         </React.Fragment>
