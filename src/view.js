@@ -18,7 +18,7 @@ const View = (props) => {
         streamon: false,
         commands: [],
         inAir: false,
-        flightMode: true
+        flightMode: false
     });
 
     useEffect(() => {
@@ -224,6 +224,15 @@ const View = (props) => {
     //     })
     // }
 
+    const handleModeChange = (e) => {
+        e.preventDefault();
+
+        setState(prevState => ({
+            ...prevState,
+            flightMode: !prevState.flightMode
+        }));
+    }
+
     const {showSettings, flightMode} = state;
     const {battery} = props;
     return (
@@ -251,6 +260,7 @@ const View = (props) => {
                 : 
                 <PathBuilder />
             }
+            <button onClick={handleModeChange}>Change mode</button>
         </React.Fragment>
     );
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import SettingsContext from './settings-context';
-import ThreeModel from './ThreeCanvas';
+import ThreeModel from './threeCanvas';
 import View from './view';
 import socket from './socket';
 import "./App.css";

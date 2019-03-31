@@ -3,6 +3,21 @@ import SettingsContext from './settings-context';
 import socket from './socket';
 
 const settings = {
+    commands: [
+        "takeoff",
+        "land",
+        "up",
+        "down",
+        "left",
+        "right",
+        "forward",
+        "back",
+        "cw",
+        "ccw",
+        "flip",
+        "go",
+        "curve",
+    ],
     controls: [
         {
             name: "Forward",
