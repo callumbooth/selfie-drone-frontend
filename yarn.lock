@@ -779,6 +779,24 @@
   resolved "https://registry.yarnpkg.com/@csstools/convert-colors/-/convert-colors-1.4.0.tgz#ad495dc41b12e75d588c6db8b9834f08fa131eb7"
   integrity sha512-5a6wqoJV/xEdbRNKVo6I4hO3VjyDq//8q2f9I6PBAvMesJHFauXDorcNCsr9RzvsZnaWi5NYCcfyqP1QeFHFbw==
 
+"@cycjimmy/awesome-js-funcs@^2.1.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@cycjimmy/awesome-js-funcs/-/awesome-js-funcs-2.3.0.tgz#a6a746461c41affd7932630ec94d02c9823fb7f7"
+  integrity sha512-HXJrv0S1gzjP9h2cmE57m+0XnVsGIsidPEjxUR5i50iGIxbjEe1EhL6iSh2P1LXdjjbt1U/UHj6n93yzDwt1gw==
+
+"@cycjimmy/jsmpeg-player@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@cycjimmy/jsmpeg-player/-/jsmpeg-player-5.0.0.tgz#0447efade60fa505de841f90fc8bf3751cc5a67a"
+  integrity sha512-PmoW0q/aIwpkdka2uT+alrmNDcP64CVg2kMR2kQowaRwoR6wAn+8Hkn3kMcrH5BwDzZQNknygUwgIgrSIY0LEg==
+  dependencies:
+    "@cycjimmy/awesome-js-funcs" "^2.1.0"
+    "@cycjimmy/sass-lib" "^1.0.3"
+
+"@cycjimmy/sass-lib@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@cycjimmy/sass-lib/-/sass-lib-1.0.3.tgz#df5fbd7edc3dcbb6531bf186713e2e052391c3dc"
+  integrity sha512-OTr8uMjeRapr0bWTKs782Jj84/xQt1XvVl5ZyYW1yi4sEbqY1FfW1FYLeflBp4gSU99o4c/nPi2Fx5aRxna5dw==
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
